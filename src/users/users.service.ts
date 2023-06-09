@@ -31,9 +31,15 @@ export class UsersService {
       }
  
     async updateUser(id: string, user: User): Promise<User>{
-        const userUpdated = this.userModel.findById(id);
+        const userUpdated = await this.userModel.findById(id);
         await this.userModel.findByIdAndUpdate(id,user);
         return userUpdated;
     }
+
+    async deleteUser(id: string): Promise<User> {
+        const deletedUser = await this.userModel.findByIdAndDelete(id);
+        return deletedUser;
+      }
+      
       
 }
