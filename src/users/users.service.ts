@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { User } from './schemas/user.schema';
 import { InjectModel } from '@nestjs/mongoose'
 import * as mongoose from 'mongoose'
+import { Query  } from 'express-serve-static-core';
 
 @Injectable()
 export class UsersService {
@@ -10,8 +11,20 @@ export class UsersService {
         private userModel: mongoose.Model<User>
     ){}
 
-    async getUsers(): Promise<User[]> {
-        const users = await this.userModel.find()
+    async getUsers(query: Query): Promise<User[]> {
+
+        const resPerPage = 2
+        const currentPage = Number(query.page) || 1
+        const skip = resPerPage * (currentPage - 1)
+
+        const keyword = query.keyword ? {
+            name :{
+                $regex: query.keyword,
+                $options: 'i'
+            }
+        } : {}
+
+        const users = await this.userModel.find({...keyword}).limit(resPerPage).skip(skip)
         return users;
     }
 
