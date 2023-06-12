@@ -1,8 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { User } from './schemas/user.schema';
 import { InjectModel } from '@nestjs/mongoose'
 import * as mongoose from 'mongoose'
 import { Query  } from 'express-serve-static-core';
+
 
 @Injectable()
 export class UsersService {
@@ -34,6 +35,13 @@ export class UsersService {
     }
 
     async getOne(id: string): Promise<User> {
+
+        const isValidId = mongoose.isValidObjectId(id)
+
+        if(!isValidId){
+            throw new BadRequestException('Please enter a correct ID')
+        }
+
         const user = await this.userModel.findById(id);
       
         if (!user) {
@@ -54,5 +62,5 @@ export class UsersService {
         return deletedUser;
       }
       
-      
+        
 }
